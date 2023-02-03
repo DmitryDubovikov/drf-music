@@ -30,3 +30,6 @@ class Content(models.Model):
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
     track_number = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.album}, {self.song}, track # {self.track_number}"
