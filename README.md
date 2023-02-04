@@ -9,3 +9,6 @@ Run:
 Check Swagger docs:
 
 http://localhost:8000/api/schema/docs/
+
+
+python3 manage.py spectacular --file schema.yml

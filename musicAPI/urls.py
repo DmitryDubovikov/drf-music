@@ -1,13 +1,14 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from musicAPI import views
+
+router = DefaultRouter()
+router.register(r"album", views.AlbumsViewSet)
+router.register(r"song", views.SongsViewSet)
+router.register(r"singer", views.SingersViewSet)
 
 
 urlpatterns = [
-    path("singers", views.SingersView.as_view()),
-    path("singers/<int:pk>", views.SingleSingerView.as_view()),
-    path("albums", views.AlbumsView.as_view()),
-    path("albums/<int:pk>", views.SingleAlbumView.as_view()),
-    path("songs", views.SongsView.as_view()),
-    path("songs/<int:pk>", views.SingleSongView.as_view()),
-    path("catalog", views.ContentView.as_view()),
+    path("", include(router.urls)),
+    path("content", views.ContentView.as_view()),
 ]

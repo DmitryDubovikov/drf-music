@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, viewsets
+from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
 from .models import Singer, Album, Song, Content
 from .serializers import (
     SingerSerializer,
@@ -11,34 +13,43 @@ from .serializers import (
 # Create your views here.
 
 
-class SingersView(generics.ListCreateAPIView):
+class SingersViewSet(viewsets.ViewSet):
+    """
+    A simple ViewSet for getting all singers.
+    """
+
     queryset = Singer.objects.all()
-    serializer_class = SingerSerializer
+
+    @extend_schema(responses=SingerSerializer)
+    def list(self, request):
+        serializer = SingerSerializer(self.queryset, many=True)
+        return Response(serializer.data)
 
 
-class SingleSingerView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Singer.objects.all()
-    serializer_class = SingerSerializer
+class AlbumsViewSet(viewsets.ViewSet):
+    """
+    A simple ViewSet for getting all albums.
+    """
 
-
-class AlbumsView(generics.ListCreateAPIView):
     queryset = Album.objects.all()
-    serializer_class = AlbumSerializer
+
+    @extend_schema(responses=AlbumSerializer)
+    def list(self, request):
+        serializer = AlbumSerializer(self.queryset, many=True)
+        return Response(serializer.data)
 
 
-class SingleAlbumView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Album.objects.all()
-    serializer_class = AlbumSerializer
+class SongsViewSet(viewsets.ViewSet):
+    """
+    A simple ViewSet for getting all songs.
+    """
 
-
-class SongsView(generics.ListCreateAPIView):
     queryset = Song.objects.all()
-    serializer_class = SongSerializer
 
-
-class SingleSongView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Song.objects.all()
-    serializer_class = SongSerializer
+    @extend_schema(responses=SongSerializer)
+    def list(self, request):
+        serializer = SongSerializer(self.queryset, many=True)
+        return Response(serializer.data)
 
 
 class ContentView(generics.ListCreateAPIView):
