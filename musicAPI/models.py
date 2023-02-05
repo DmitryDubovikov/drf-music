@@ -23,7 +23,7 @@ class Album(models.Model):
     year = models.IntegerField()
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.singer}, {self.year})"
 
 
 class Content(models.Model):

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from .models import Singer, Album, Song, Content
@@ -24,6 +24,14 @@ class SingersViewSet(viewsets.ViewSet):
     def list(self, request):
         serializer = SingerSerializer(self.queryset, many=True)
         return Response(serializer.data)
+
+    @extend_schema(responses=SingerSerializer)
+    def create(self, request):
+        serializer = SingerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"msg": "Data  created"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AlbumsViewSet(viewsets.ViewSet):

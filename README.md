@@ -12,3 +12,5 @@ http://localhost:8000/api/schema/docs/
 
 
 python3 manage.py spectacular --file schema.yml
+
+python manage.py populate_tables csv_data.csv
