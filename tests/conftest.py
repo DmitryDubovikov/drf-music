@@ -1,11 +1,3 @@
-# from django.conf import settings
-
-# settings.configure()
-
-# import django
-
-# django.setup()
-
 import pytest
 from pytest_factoryboy import register
 from rest_framework.test import APIClient
@@ -19,4 +11,4 @@ register(AlbumFactory)
 
 @pytest.fixture
 def api_client():
-    return APIClient
+    return APIClient()

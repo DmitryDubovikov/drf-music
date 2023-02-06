@@ -13,15 +13,19 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser):
-        parser.add_argument("filename", type=str, help="filename for csv file")
+        parser.add_argument("dirname", type=str, help="dirname for csv files")
 
     def get_current_app_path(self):
         return apps.get_app_config("musicAPI").path
 
-    def get_csv_file(self, filename):
+    def get_csv_files(self, dirname):
         app_path = self.get_current_app_path()
-        file_path = os.path.join(app_path, "management", "commands", filename)
-        return file_path
+        file_paths = []
+        file_paths.append(os.path.join(app_path, dirname, "Singers.csv"))
+        file_paths.append(os.path.join(app_path, dirname, "Songs.csv"))
+        file_paths.append(os.path.join(app_path, dirname, "Albums.csv"))
+        file_paths.append(os.path.join(app_path, dirname, "Content.csv"))
+        return file_paths
 
     def clear_model(self, model_name):
         try:
@@ -30,60 +34,54 @@ class Command(BaseCommand):
             raise CommandError(f"Error in clearing {model_name}: {str(e)}")
 
     def handle(self, *args, **kwargs):
-        filename = kwargs["filename"]
-        self.stdout.write(self.style.SUCCESS(f"filename:{filename}"))
-        file_path = self.get_csv_file(filename)
-        line_count = 0
-        content_data = []
-        try:
-            with open(file_path) as csv_file:
-                csv_reader = csv.reader(csv_file, delimiter=";")
-                for row in csv_reader:
-                    if row != "" and line_count >= 1:
-                        content_data.append(row)
-                    line_count += 1
+        dirname = kwargs["dirname"]
+        file_paths = self.get_csv_files(dirname)
 
-            singers = dict.fromkeys(set([x[0] for x in content_data]))
-            songs = dict.fromkeys(set([x[1] for x in content_data]))
-            albums = dict.fromkeys(set([(x[2], x[0]) for x in content_data]))
+        for file_path in file_paths:
+            model_data = []
+            model_fields = []
+            line_count = 0
 
-            self.clear_model(model_name=Singer)
-            for key in singers.keys():
-                try:
-                    obj = Singer.objects.create(name=key)
-                    singers[key] = obj.id
-                except Exception as e:
-                    raise CommandError(f"Error in inserting singer: {str(e)}")
+            try:
+                with open(file_path) as csv_file:
+                    csv_reader = csv.reader(csv_file, delimiter=";")
+                    for row in csv_reader:
+                        if line_count == 0:
+                            model_fields = row.copy()
+                        if row != "" and line_count >= 1:
+                            el = {}
+                            for i in range(len(row)):
+                                el[model_fields[i]] = row[i]
+                            model_data.append(el)
+                        line_count += 1
 
-            self.clear_model(model_name=Song)
-            for key in songs.keys():
-                try:
-                    obj = Song.objects.create(title=key)
-                    songs[key] = obj.id
-                except Exception as e:
-                    raise CommandError(f"Error in inserting song: {str(e)}")
+                    if file_path.find("Singer") != -1:
+                        django_list = [Singer(**vals) for vals in model_data]
+                        self.clear_model(model_name=Singer)
+                        Singer.objects.bulk_create(django_list)
 
-            self.clear_model(model_name=Album)
-            for key in albums.keys():
-                try:
-                    obj = Album.objects.create(
-                        title=key[0], year=2023, singer=Singer.objects.get(name=key[1])
-                    )
-                    albums[key] = obj.id
-                except Exception as e:
-                    raise CommandError(f"Error in inserting album: {str(e)}")
+                    elif file_path.find("Song") != -1:
+                        django_list = [Song(**vals) for vals in model_data]
+                        self.clear_model(model_name=Song)
+                        Song.objects.bulk_create(django_list)
 
-            self.clear_model(model_name=Content)
-            for el in content_data:
-                try:
-                    Content.objects.create(
-                        song=Song.objects.get(title=el[1]),
-                        album=Album.objects.get(title=el[2]),
-                        track_number=el[3],
-                    )
+                    elif file_path.find("Album") != -1:
+                        for el in model_data:
+                            singer = Singer.objects.get_or_create(name=el["singer"])[0]
+                            el["singer"] = singer
+                        django_list = [Album(**vals) for vals in model_data]
+                        self.clear_model(model_name=Album)
+                        Album.objects.bulk_create(django_list)
 
-                except Exception as e:
-                    raise CommandError(f"Error in inserting Content: {str(e)}")
+                    elif file_path.find("Content") != -1:
+                        for el in model_data:
+                            song = Song.objects.get_or_create(title=el["song"])[0]
+                            el["song"] = song
+                            album = Album.objects.get_or_create(title=el["album"])[0]
+                            el["album"] = album
+                        django_list = [Content(**vals) for vals in model_data]
+                        self.clear_model(model_name=Content)
+                        Content.objects.bulk_create(django_list)
 
-        except FileNotFoundError:
-            raise CommandError(f"File {file_path} does not exist")
+            except FileNotFoundError:
+                raise CommandError(f"File {file_path} does not exist")

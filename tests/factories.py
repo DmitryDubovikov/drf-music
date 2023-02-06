@@ -22,4 +22,4 @@ class AlbumFactory(factory.django.DjangoModelFactory):
 
     title = "test_album"
     year = 2019
-    singer = factory.SubFactory(SongFactory)
+    singer = factory.SubFactory(SingerFactory)

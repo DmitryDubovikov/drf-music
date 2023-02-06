@@ -6,10 +6,10 @@ info:
 paths:
   /api/album/:
     get:
-      operationId: album_list
+      operationId: api_album_list
       description: A simple ViewSet for getting all albums.
       tags:
-      - album
+      - api
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -25,9 +25,9 @@ paths:
           description: ''
   /api/content:
     get:
-      operationId: content_list
+      operationId: api_content_list
       tags:
-      - content
+      - api
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -42,9 +42,9 @@ paths:
                   $ref: '#/components/schemas/Content'
           description: ''
     post:
-      operationId: content_create
+      operationId: api_content_create
       tags:
-      - content
+      - api
       requestBody:
         content:
           application/json:
@@ -70,10 +70,10 @@ paths:
           description: ''
   /api/singer/:
     get:
-      operationId: singer_list
+      operationId: api_singer_list
       description: A simple ViewSet for getting all singers.
       tags:
-      - singer
+      - api
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -87,12 +87,152 @@ paths:
                 items:
                   $ref: '#/components/schemas/Singer'
           description: ''
+    post:
+      operationId: api_singer_create
+      description: A simple ViewSet for getting all singers.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Singer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Singer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Singer'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Singer'
+          description: ''
+  /api/singer/{id}/:
+    get:
+      operationId: api_singer_retrieve
+      description: A simple ViewSet for getting all singers.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this singer.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Singer'
+          description: ''
+    put:
+      operationId: api_singer_update
+      description: A simple ViewSet for getting all singers.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this singer.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Singer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Singer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Singer'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Singer'
+          description: ''
+    patch:
+      operationId: api_singer_partial_update
+      description: A simple ViewSet for getting all singers.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this singer.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSinger'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSinger'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSinger'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Singer'
+          description: ''
+    delete:
+      operationId: api_singer_destroy
+      description: A simple ViewSet for getting all singers.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this singer.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
   /api/song/:
     get:
-      operationId: song_list
+      operationId: api_song_list
       description: A simple ViewSet for getting all songs.
       tags:
-      - song
+      - api
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -143,6 +283,15 @@ components:
       - id
       - song
       - track_number
+    PatchedSinger:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
     Singer:
       type: object
       properties:

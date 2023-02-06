@@ -6,9 +6,9 @@ router = DefaultRouter()
 router.register(r"album", views.AlbumsViewSet)
 router.register(r"song", views.SongsViewSet)
 router.register(r"singer", views.SingersViewSet)
+router.register(r"content", views.ContentViewSet)
 
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("content", views.ContentView.as_view()),
 ]
