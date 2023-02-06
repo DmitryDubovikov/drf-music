@@ -1,16 +1,15 @@
 # drf-music
 
-Run:
+Run / Чтобы запустить:
 
     docker-compose build
 
     docker-compose up
 
-Check Swagger docs:
+Check Swagger docs / Swagger документация:
 
 http://localhost:8000/api/schema/docs/
 
+Check PostgreSQL database with pgAdmin / Чтобы посмотреть PostgreSQL базу через pgAdmin:
 
-python3 manage.py spectacular --file schema.yml
-
-python manage.py populate_tables csv_data.csv
+http://localhost:5050/
